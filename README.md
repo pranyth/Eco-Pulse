@@ -33,6 +33,9 @@ It simulates live IoT telemetry for **solar generation, grid usage, and battery 
 - CO₂ emissions avoided (kg)
 - Continuous accumulation over time
 
+  ![Uploading image.png…]()
+
+
 ---
 
 ## 🏗️ Tech Stack
