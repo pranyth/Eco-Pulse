@@ -1,191 +1,69 @@
-# 🌱 Eco-Pulse — Energy Command Center for a Net-Zero Campus
+# 🌱 Eco-Pulse — Real-Time Energy Command Center
 
-Eco-Pulse is a **full-stack MERN Energy Command Center Dashboard** designed for monitoring and simulating energy flows in a **Net-Zero smart campus**.
-It combines real-time IoT-like energy simulation, backend APIs, and scalable architecture to resemble an industrial energy monitoring system.
+Eco-Pulse is a full-stack real-time **Energy Monitoring & Decision Dashboard** designed for smart campuses and net-zero infrastructure.
 
----
-
-## 🚀 Project Overview
-
-Eco-Pulse simulates and visualizes campus-level energy data, including:
-
-* ☀️ Solar power generation
-* ⚡ Grid energy consumption
-* 🔋 Battery Energy Storage System (BESS) behavior
-* 🛠️ Maintenance alerts for critical energy infrastructure
-
-The system is built with **real-world constraints and logic**, not random data, making it suitable for learning, demos, and portfolio use.
+It simulates live IoT telemetry for **solar generation, grid usage, and battery storage (BESS)**, processes it on the backend, and visualizes it through a modern command-center UI with **live charts, carbon analytics, and smart alerts**.
 
 ---
 
-## 🔋 Core Features
+## 🚀 Features
 
-### ⚡ Real-Time Energy Simulator
+### ⚡ Real-Time Energy Monitoring
+- Solar power generation (kW)
+- Grid load consumption (kW)
+- Battery energy & power (kWh / kW)
+- Battery State of Charge (SoC)
+- Live updates via **WebSockets (Socket.IO)**
 
-* Simulates IoT telemetry every **5 seconds**
-* Realistic energy fluctuations and limits
-* Models:
+### 📊 Live Analytics Dashboard
+- Streaming line charts (Recharts)
+- Multi-source energy comparison
+- Battery charging/discharging behavior
+- Responsive, command-center style UI
 
-  * Solar generation (kW)
-  * Grid consumption (kW)
-  * Battery Energy Storage (2.5 MWh BESS)
-* Charging / Discharging logic based on supply vs demand
+### 🧠 Smart Alerts (Rule-Based Intelligence)
+- High grid dependency warnings
+- Low battery critical alerts
+- Inefficient charging detection
+- Peak demand risk alerts
+- Cooldown logic to prevent alert spam
 
-### 🧠 Backend Energy Engine
-
-* Node.js + Express architecture
-* Modular simulator engine
-* Designed for real-time streaming (Socket.IO integration planned)
-
-### 🛠️ Maintenance Log System
-
-* MongoDB-backed CRUD APIs
-* Track alerts for:
-
-  * HVAC systems
-  * Solar inverters
-  * Battery systems
-* Severity levels and status tracking (Open / Resolved)
-
-### 🧩 Scalable Architecture
-
-* Clear separation of concerns
-* Simulator isolated from APIs
-* Backend and frontend decoupled
-* Cloud-ready design (local MongoDB for dev)
+### 🌍 Carbon Impact Tracking
+- Total solar energy generated (kWh)
+- CO₂ emissions avoided (kg)
+- Continuous accumulation over time
 
 ---
 
-## 🧰 Tech Stack
+## 🏗️ Tech Stack
+
+### Frontend
+- React (Vite)
+- Socket.IO Client
+- Recharts
+- Custom dark-mode dashboard styling
 
 ### Backend
-
-* **Node.js**
-* **Express.js**
-* **MongoDB (Local for development)**
-* **Mongoose**
-* **Socket.IO (planned)**
-
-### Frontend *(upcoming)*
-
-* **React**
-* **Tailwind CSS**
-* **Recharts** (for live graphs)
+- Node.js + Express
+- Socket.IO Server
+- MongoDB (Atlas)
+- Modular energy simulation engine
 
 ---
 
-## 🗂️ Project Structure
+## 🧪 How It Works
 
-```
-Eco-Pulse/
-├── backend/
-│   ├── simulator/        # Energy simulation engine
-│   ├── models/           # MongoDB schemas
-│   ├── routes/           # REST APIs
-│   ├── server.js         # Backend entry point
-│   └── .env              # Environment variables
-├── frontend/             # React frontend (planned)
-└── README.md
-```
+1. Backend simulates real-time energy data every 5 seconds
+2. Data is broadcast to all connected clients via WebSockets
+3. Frontend updates KPIs, charts, alerts, and carbon metrics live
+4. Smart alert engine evaluates system health continuously
 
 ---
 
-## ▶️ Running the Backend Locally
+## ▶️ Running Locally
 
-### 1️⃣ Install dependencies
-
+### Backend
 ```bash
 cd backend
 npm install
-```
-
-### 2️⃣ Set environment variables
-
-Create a `.env` file inside `backend/`:
-
-```env
-MONGO_URI=mongodb://127.0.0.1:27017/ecopulse
-```
-
-### 3️⃣ Start the server
-
-```bash
 node server.js
-```
-
-### Expected output:
-
-```
-MongoDB connected 🌍
-Eco-Pulse backend running on port 5000
-⚡ Energy Update: { ... }
-```
-
----
-
-## 🌍 API Endpoints
-
-### Maintenance Logs
-
-```
-GET    /api/maintenance
-POST   /api/maintenance
-PUT    /api/maintenance/:id
-DELETE /api/maintenance/:id
-```
-
----
-
-## 🌱 Vision & Motivation
-
-Eco-Pulse is inspired by **real industrial energy monitoring systems** used in:
-
-* smart campuses
-* renewable energy plants
-* sustainability-focused infrastructure
-
-The project emphasizes:
-
-* real-time data flow
-* energy-domain realism
-* clean backend design
-* production-oriented architecture
-
----
-
-## 🛣️ Roadmap
-
-* [x] Backend architecture setup
-* [x] Energy simulator engine
-* [x] Maintenance CRUD APIs
-* [ ] Socket.IO real-time streaming
-* [ ] React dashboard UI
-* [ ] Live charts with Recharts
-* [ ] Solar yield & carbon offset analytics
-* [ ] Cloud deployment
-
----
-
-## 📌 Author
-
-**Pranith K**
-Computer Science Engineering
-Project: *Eco-Pulse – Energy Command Center*
-
----
-
-## 🏷️ Tags
-
-```
-mern
-nodejs
-mongodb
-iot-simulation
-energy-dashboard
-smart-campus
-sustainability
-socket-io
-full-stack
-```
-
-
