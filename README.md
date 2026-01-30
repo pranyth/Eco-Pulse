@@ -67,3 +67,37 @@ It simulates live IoT telemetry for **solar generation, grid usage, and battery 
 cd backend
 npm install
 node server.js
+```
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Open: http://localhost:5173
+
+📌 Project Status
+
+✅ Phase 1 — Backend simulation & APIs
+✅ Phase 2 — Real-time dashboard UI
+✅ Phase 3 — Smart alerts & analytics
+
+This version represents a complete, resume-ready system.
+
+📈 Possible Future Enhancements
+
+Predictive battery SoC forecasting
+
+Alert history & audit logs
+
+Role-based dashboards (admin/operator)
+
+Deployment on cloud (Render / Vercel)
+
+Real IoT sensor integration
+
+👤 Author
+
+Pranith K
+B.Tech CSE
+Focus: Full-Stack Systems, Cloud & Energy Tech
