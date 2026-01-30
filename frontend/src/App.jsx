@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import {
   LineChart,
@@ -15,6 +15,9 @@ const socket = io("http://localhost:5000", {
   transports: ["websocket"],
 });
 
+/* =========================
+   STYLES (UNCHANGED)
+========================= */
 const styles = {
   page: {
     minHeight: "100vh",
@@ -62,31 +65,111 @@ const styles = {
     marginBottom: "10px",
   },
   alertCritical: {
-    background: "rgba(239,68,68,0.15)",
+    background: "rgba(239,68,68,0.18)",
     color: "#f87171",
     padding: "10px",
     borderRadius: "8px",
   },
   alertWarn: {
-    background: "rgba(234,179,8,0.15)",
+    background: "rgba(234,179,8,0.18)",
     color: "#fde047",
+    padding: "10px",
+    borderRadius: "8px",
+  },
+  alertInfo: {
+    background: "rgba(56,189,248,0.18)",
+    color: "#7dd3fc",
     padding: "10px",
     borderRadius: "8px",
   },
 };
 
+/* =========================
+   PHASE 3.3 LOGIC
+========================= */
+const ALERT_COOLDOWN_MS = 15000; // prevents flicker
+
 export default function App() {
   const [energy, setEnergy] = useState(null);
   const [history, setHistory] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+
+  const alertMemory = useRef({}); // persists between renders
 
   useEffect(() => {
     socket.on("energy:update", (data) => {
       setEnergy(data);
+
       setHistory((prev) => [...prev.slice(-12), data]);
+
+      evaluateSmartAlerts(data);
     });
 
     return () => socket.off("energy:update");
   }, []);
+
+  /* =========================
+     SMART ALERT ENGINE
+  ========================= */
+  function evaluateSmartAlerts(data) {
+    const now = Date.now();
+    const nextAlerts = [];
+
+    function pushAlert(key, severity, message, reason) {
+      if (
+        !alertMemory.current[key] ||
+        now - alertMemory.current[key] > ALERT_COOLDOWN_MS
+      ) {
+        alertMemory.current[key] = now;
+        nextAlerts.push({ severity, message, reason });
+      }
+    }
+
+    // 1️⃣ Grid dependency
+    if (data.gridKw > data.solarKw * 1.3) {
+      pushAlert(
+        "GRID_DEP",
+        "warning",
+        "High dependency on grid power",
+        "Grid usage exceeds solar generation by >30%"
+      );
+    }
+
+    // 2️⃣ Battery critically low
+    if (data.batteryKWh < 500) {
+      pushAlert(
+        "BAT_LOW",
+        "critical",
+        "Battery energy critically low",
+        "Battery below 20% capacity"
+      );
+    }
+
+    // 3️⃣ Battery charging inefficiency
+    if (
+      data.batteryState === "Charging" &&
+      data.solarKw < data.gridKw
+    ) {
+      pushAlert(
+        "INEFF_CHARGE",
+        "info",
+        "Battery charging inefficiently",
+        "Charging relies on grid instead of solar"
+      );
+    }
+
+    // 4️⃣ Heavy load scenario
+    if (data.gridKw > 70 && data.batteryState === "Discharging") {
+      pushAlert(
+        "PEAK_LOAD",
+        "warning",
+        "Peak demand with battery discharge",
+        "Risk of accelerated battery degradation"
+      );
+    }
+
+    setAlerts(nextAlerts);
+  }
 
   if (!energy) {
     return (
@@ -99,12 +182,10 @@ export default function App() {
   return (
     <div style={styles.page}>
       <div style={styles.container}>
-        {/* Header */}
-        <div style={styles.header}>
-          🌱 Eco-Pulse Command Center
-        </div>
+        {/* HEADER */}
+        <div style={styles.header}>🌱 Eco-Pulse Command Center</div>
 
-        {/* Metrics */}
+        {/* METRICS */}
         <div style={styles.grid}>
           <Metric title="Solar Power" value={`${energy.solarKw} kW`} />
           <Metric title="Grid Load" value={`${energy.gridKw} kW`} />
@@ -113,7 +194,7 @@ export default function App() {
           <Metric title="Battery SoC" value={`${energy.batterySoC}%`} />
         </div>
 
-        {/* Status + Alerts */}
+        {/* STATUS + ALERTS */}
         <div style={styles.grid}>
           <div style={styles.card}>
             <div style={styles.sectionTitle}>Battery Status</div>
@@ -122,33 +203,38 @@ export default function App() {
 
           <div style={styles.card}>
             <div style={styles.sectionTitle}>Smart Alerts</div>
-            {energy.alerts.length === 0 ? (
+            {alerts.length === 0 ? (
               <p style={{ color: "#4ade80" }}>All systems normal</p>
             ) : (
-              energy.alerts.map((a, i) => (
+              alerts.map((a, i) => (
                 <div
                   key={i}
                   style={
                     a.severity === "critical"
                       ? styles.alertCritical
-                      : styles.alertWarn
+                      : a.severity === "warning"
+                      ? styles.alertWarn
+                      : styles.alertInfo
                   }
                 >
-                  {a.message}
+                  <strong>{a.message}</strong>
+                  <div style={{ fontSize: "12px", opacity: 0.8 }}>
+                    {a.reason}
+                  </div>
                 </div>
               ))
             )}
           </div>
         </div>
 
-        {/* Carbon */}
+        {/* CARBON */}
         <div style={styles.card}>
           <div style={styles.sectionTitle}>Carbon Impact</div>
           <p>Solar Energy: {energy.carbon.totalSolarEnergyKWh} kWh</p>
           <p>CO₂ Avoided: {energy.carbon.co2AvoidedKg} kg</p>
         </div>
 
-        {/* Chart */}
+        {/* CHART */}
         <div style={styles.card}>
           <div style={styles.sectionTitle}>Live Energy Trends</div>
           <div style={{ height: "320px" }}>
@@ -192,6 +278,9 @@ export default function App() {
   );
 }
 
+/* =========================
+   KPI COMPONENT
+========================= */
 function Metric({ title, value }) {
   return (
     <div style={styles.card}>
